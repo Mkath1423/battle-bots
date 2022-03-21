@@ -304,7 +304,7 @@ public class BattleBotArena extends JPanel implements MouseListener, MouseWheelL
 	/**
 	 * Number of bullets on screen at once for each bot
 	 */
-	public static final int 	NUM_BULLETS = 4;
+	public static final int 	NUM_BULLETS =100;
 	/**
 	 * Bot speed in pixels/frame
 	 */

@@ -12,6 +12,13 @@ import arena.Bullet;
 public class StapletonBot extends Bot{
 
     private int DANGE_DISTANCE = 150; 
+    private int WALL_DISTANCE = 50;
+    private int BULLET_DISTANCE = 50;
+
+    private int X_TARGET = 300;
+    private int Y_TARGET = 300;
+
+
     private BotHelper botHelper = new BotHelper();
 
     @Override
@@ -45,48 +52,99 @@ public class StapletonBot extends Bot{
 	}
 
     public int dodge(BotInfo me, Bullet bullet){
-        if(bullet.getXSpeed() == 0 && bullet.getYSpeed() < 0 && bullet.getY() > me.getY()){
+
+        // Coming from y?
+        if(bullet.getYSpeed() != 0){
+            // is on left wall?
+            if(Math.abs(bullet.getX() - BattleBotArena.LEFT_EDGE) < WALL_DISTANCE){
+                return BattleBotArena.RIGHT;
+            }
+            // is on right wall?
+            if(Math.abs(bullet.getX() - BattleBotArena.RIGHT_EDGE) < WALL_DISTANCE){
+                return BattleBotArena.LEFT;
+            }
+
+            // is on left?
+            if(bullet.getX() < me.getX()){
+                return BattleBotArena.RIGHT;
+            }
+            // is on right?
             return BattleBotArena.LEFT;
         }
-        if(bullet.getXSpeed() == 0 && bullet.getYSpeed() > 0 && bullet.getY() < me.getY()){
-            return BattleBotArena.RIGHT;
-        }
-        if(bullet.getYSpeed() == 0 && bullet.getXSpeed() < 0 && bullet.getX() > me.getX()){
+
+        // Coming from x?
+        if(bullet.getXSpeed() != 0){
+            // is on the top wall?
+            if(Math.abs(bullet.getY() - BattleBotArena.TOP_EDGE) < WALL_DISTANCE){
+                return BattleBotArena.DOWN;
+            }
+            // is on the bottom wall?
+            if(Math.abs(bullet.getY() - BattleBotArena.BOTTOM_EDGE) < WALL_DISTANCE){
+                return BattleBotArena.UP;
+            }
+
+            // Is on above?
+            if(bullet.getY() < me.getY()){
+                return BattleBotArena.DOWN;
+            }
+            // Is on below?
             return BattleBotArena.UP;
         }
-        if(bullet.getYSpeed() == 0 && bullet.getXSpeed() > 0 && bullet.getX() < me.getX()){
-            return BattleBotArena.DOWN;
-        }
+
         return BattleBotArena.STAY;
     }
 
-    @Override
-    public int getMove(BotInfo me, boolean shotOK, BotInfo[] liveBots, BotInfo[] deadBots, Bullet[] bullets) {
-        
-       
+    private int getMoveSafe(BotInfo me, boolean shotOK, BotInfo[] liveBots, BotInfo[] deadBots, Bullet[] bullets){
 
-        Bullet closest = botHelper.findClosestBullet(me, bullets);
-        System.out.printf("DANGER: %s (%s, %s)\n", distance(me, closest), closest.getX(), closest.getY());
+        //System.out.printf("DANGER: %s (%s, %s)\n", distance(me, closest), closest.getX(), closest.getY());
 
+        //System.out.printf("\n(%s, %s), (%s, %s) ", me.getX() - 20, me.getX() + 20, me.getY() - 20, me.getY() + 20);
 
         List<Bullet> dangerous_bullets = new ArrayList<>();
         for(Bullet bullet : bullets){
+            // is the bullet close
             if(botHelper.calcDistance(me.getX(), me.getY(), bullet.getX(), bullet.getY()) > DANGE_DISTANCE) continue;
-            if(bullet.getXSpeed() == 0 && bullet.getYSpeed() < 0 && bullet.getY() > me.getY()){
+
+            //System.out.printf("BULLET(%s, %s) ", bullet.getX(), bullet.getY());
+
+            // will the bullet collide if I stay still
+            if(!(bullet.getYSpeed() != 0 && bullet.getX() < me.getX() + BULLET_DISTANCE && bullet.getX() > me.getX() - BULLET_DISTANCE ||
+                 bullet.getXSpeed() != 0 && bullet.getY() < me.getY() + BULLET_DISTANCE && bullet.getY() > me.getY() - BULLET_DISTANCE   )) continue;
+
+            if(bullet.getXSpeed() == 0 && bullet.getYSpeed() < 0 && bullet.getY() > me.getY() - BULLET_DISTANCE){
                 dangerous_bullets.add(bullet);
             }
-            else if(bullet.getXSpeed() == 0 && bullet.getYSpeed() > 0 && bullet.getY() < me.getY()){
+            else if(bullet.getXSpeed() == 0 && bullet.getYSpeed() > 0 && bullet.getY() < me.getY() + BULLET_DISTANCE){
                 dangerous_bullets.add(bullet);
             }
-            else if(bullet.getYSpeed() == 0 && bullet.getXSpeed() < 0 && bullet.getX() > me.getX()){
+            else if(bullet.getYSpeed() == 0 && bullet.getXSpeed() < 0 && bullet.getX() > me.getX() - BULLET_DISTANCE){
                 dangerous_bullets.add(bullet);
             }
-            else if(bullet.getYSpeed() == 0 && bullet.getXSpeed() > 0 && bullet.getX() < me.getX()){
+            else if(bullet.getYSpeed() == 0 && bullet.getXSpeed() > 0 && bullet.getX() < me.getX() + BULLET_DISTANCE){
                 dangerous_bullets.add(bullet);
             }
         }
 
-        return dodge(me, findClosestBullet(me, dangerous_bullets));
+        if(!shotOK || dangerous_bullets.size() != 0){
+            return dodge(me, findClosestBullet(me, dangerous_bullets));
+        }
+        else{
+            double x_diff = me.getX() - X_TARGET;
+            double y_diff = me.getY() - Y_TARGET;
+            
+            if(Math.abs(x_diff) > Math.abs(y_diff)){
+                if(x_diff <= 0){
+                    return BattleBotArena.RIGHT;
+                }
+                return BattleBotArena.LEFT;
+            }
+            else{
+                if(y_diff <= 0){
+                    return BattleBotArena.DOWN;
+                }
+                return BattleBotArena.UP;
+            }
+        }
 
         // if(!shotOK || dangerous_bullets.size() != 0){
         //     // dodge closest
@@ -95,6 +153,16 @@ public class StapletonBot extends Bot{
         //     // line up with a robot and shoot
         // }
         // return 0;
+    }
+
+    @Override
+    public int getMove(BotInfo me, boolean shotOK, BotInfo[] liveBots, BotInfo[] deadBots, Bullet[] bullets) {
+        try {
+            return getMoveSafe(me, shotOK, liveBots, deadBots, bullets);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return BattleBotArena.STAY;
+        }
     }
 
     @Override
