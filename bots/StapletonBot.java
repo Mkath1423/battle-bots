@@ -11,19 +11,23 @@ import arena.Bullet;
 
 public class StapletonBot extends Bot{
 
-    private int DANGE_DISTANCE = 150; 
-    private int WALL_DISTANCE = 50;
-    private int BULLET_DISTANCE = 50;
+    private final int DANGE_DISTANCE = 150; 
+    private final int WALL_DISTANCE = 50;
+    private final int BULLET_DISTANCE = 50;
 
-    private int X_TARGET = 300;
-    private int Y_TARGET = 300;
+    private final int ACCURACY = 20;
 
+    private final int X_TARGET = 300;
+    private final int Y_TARGET = 300;
+
+    private final int SHOOT_DELAY_START   = 20;
+    private int shootDelayCounter = 0;
 
     private BotHelper botHelper = new BotHelper();
 
     @Override
     public void newRound() {
-        // TODO Auto-generated method stub
+        shootDelayCounter = SHOOT_DELAY_START;
         
     }
 
@@ -50,6 +54,24 @@ public class StapletonBot extends Bot{
         
 		return closest;
 	}
+
+
+    private int shoot(BotInfo me, double x, double y){
+        if(Math.abs(me.getX() - x) <= ACCURACY){
+            if(x > me.getX()){
+                return BattleBotArena.FIRERIGHT;
+            }
+            return BattleBotArena.FIRELEFT;
+        }
+        if(Math.abs(me.getY() - y) <= ACCURACY){
+            if(y > me.getY()){
+                return BattleBotArena.FIREDOWN;
+            }
+            return BattleBotArena.FIREUP;
+        }
+        
+        return 0;
+    }
 
     public int dodge(BotInfo me, Bullet bullet){
 
@@ -96,10 +118,6 @@ public class StapletonBot extends Bot{
 
     private int getMoveSafe(BotInfo me, boolean shotOK, BotInfo[] liveBots, BotInfo[] deadBots, Bullet[] bullets){
 
-        //System.out.printf("DANGER: %s (%s, %s)\n", distance(me, closest), closest.getX(), closest.getY());
-
-        //System.out.printf("\n(%s, %s), (%s, %s) ", me.getX() - 20, me.getX() + 20, me.getY() - 20, me.getY() + 20);
-
         List<Bullet> dangerous_bullets = new ArrayList<>();
         for(Bullet bullet : bullets){
             // is the bullet close
@@ -132,6 +150,11 @@ public class StapletonBot extends Bot{
             double x_diff = me.getX() - X_TARGET;
             double y_diff = me.getY() - Y_TARGET;
             
+            if(shootDelayCounter <= 0 && Math.abs(x_diff) < 20 && Math.abs(y_diff) < 20){
+                shootDelayCounter = SHOOT_DELAY_START;
+                return shoot(me, liveBots[0].getX(), liveBots[0].getY());
+            }
+
             if(Math.abs(x_diff) > Math.abs(y_diff)){
                 if(x_diff <= 0){
                     return BattleBotArena.RIGHT;
@@ -158,6 +181,7 @@ public class StapletonBot extends Bot{
     @Override
     public int getMove(BotInfo me, boolean shotOK, BotInfo[] liveBots, BotInfo[] deadBots, Bullet[] bullets) {
         try {
+            shootDelayCounter --;
             return getMoveSafe(me, shotOK, liveBots, deadBots, bullets);
         } catch (Exception e) {
             e.printStackTrace();
