@@ -1,1 +1,1 @@
-# battle-bots
+# ICS4-Battlebots

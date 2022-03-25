@@ -300,11 +300,11 @@ public class BattleBotArena extends JPanel implements MouseListener, MouseWheelL
 	 * Total number of Bots in round 1 (if you have fewer than this, the rest of the spots
 	 * in the array will be filled with Drones, RandBots, and Sentries).
 	 */
-	public static final int 	NUM_BOTS = 10;//BROOKS NOV 12 2017 Changed to 16
+	public static final int 	NUM_BOTS = 30;//BROOKS NOV 12 2017 Changed to 16
 	/**
 	 * Number of bullets on screen at once for each bot
 	 */
-	public static final int 	NUM_BULLETS =4;
+	public static final int 	NUM_BULLETS = 4;
 	/**
 	 * Bot speed in pixels/frame
 	 */
@@ -609,46 +609,37 @@ public class BattleBotArena extends JPanel implements MouseListener, MouseWheelL
 		// *** as the bots will be shuffled again later.
 		// *** Any empty spots will be filled with standard arena bots.
 
-		//bots[1] = new BrooksBot();
-		// bots[2] = new ZZBot();
-		// bots[3] = new ZZBot();
-		// bots[4] = new ZZBot();
+		bots[1] = new DerrickBot();
+		bots[2] = new VainioBot();
+		bots[3] = new JabshehBot();
+		bots[4] = new ShaunBot();
 		// bots[5] = new ZZBot();
-		// bots[6] = new ZZBot();
-		// bots[7] = new ZZBot();
-		// bots[8] = new ZZBot();
+		bots[6] = new SarmaBot();
+		bots[7] = new KernerBot();
+		bots[8] = new RasmussenBot();
 		// bots[9] = new ZZBot();
 		// bots[10] = new ZZBot();
-		// bots[11] = new ZZBot();
+		bots[11] = new AlajramiBot();
 		// bots[12] = new ZZBot();
-		// bots[13] = new ZZBot();
-		// bots[14] = new ZZBot();
+		bots[13] = new WilliamBot();
+		bots[14] = new SharmaBot();
 		// bots[15] = new ZZBot();
 		// bots[16] = new ZZBot();
-		// bots[17] = new ZZBot();
-		// bots[18] = new ZZBot();
-		// bots[19] = new ZZBot();
-		// bots[20] = new ZZBot();
-		// bots[21] = new ZZBot();
-		// bots[22] = new ZZBot();
-		// bots[23] = new ZZBot();
-		// bots[24] = new ZZBot();
-		// bots[25] = new ZZBot();
-		// bots[26] = new ZZBot();
-		// bots[27] = new ZZBot();
-		// bots[28] = new ZZBot();
-		// bots[29] = new ZZBot();
+		bots[17] = new StapletonBot();
+		bots[18] = new BakerBot();
+		bots[19] = new Megaman();
+		bots[20] = new FahadBot();
+		bots[21] = new KarthikBot();
+		bots[22] = new MofeBot();
+		bots[23] = new Jacky();
+		bots[24] = new KyleBot();
+		bots[25] = new KapurBot();
+		bots[26] = new JinBot();
+		bots[27] = new BennettBot();
+		bots[28] = new EdwardsBot();
+		bots[29] = new TangBot();
 		// bots[30] = new ZZBot();
-		// bots[31] = new ZZBot();
-		// bots[32] = new ZZBot();
-		// bots[33] = new ZZBot();
-		// bots[34] = new ZZBot();
-		// bots[35] = new ZZBot();
-		// bots[36] = new ZZBot();
-		// bots[37] = new ZZBot();
-		// bots[38] = new ZZBot();
-		// bots[39] = new ZZBot();
-		bots[1] = new StapletonBot();
+
 		
 		// *******************************
 		// Remaining slots filled with Drones, RandBots, and other Bots.

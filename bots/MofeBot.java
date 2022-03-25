@@ -1,70 +1,85 @@
+// this bot is mainly to provide support
 package bots;
-
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+//import java.awt.event.KeyEvent;
+//import java.awt.event.KeyListener;
 
 import arena.BattleBotArena;
 import arena.BotInfo;
 import arena.Bullet;
 
-public class BrooksBot extends Bot {
-
+public class MofeBot extends Bot {
     BotHelper helper = new BotHelper();
-
+    private double nearest_botY = 0;
+    private double nearest_botX = 0;
     @Override
     public void newRound() {
-        // TODO Auto-generated method stub
+        
         
     }
 
     @Override
     public int getMove(BotInfo me, boolean shotOK, BotInfo[] liveBots, BotInfo[] deadBots, Bullet[] bullets) {
-        // TODO Auto-generated method stub
+        
         //adding a comment
-        //helper.findClosestBot(_me, _bots)
+        //helper.findClosestBot(me, liveBots);
+        nearest_botY = (helper.findClosestBot(me, liveBots).getY());
+        nearest_botX = (helper.findClosestBot(me, liveBots).getX());
+        double XPos = me.getX();
+        double YPos = me.getY();
+        
+      
+       
+        
         return BattleBotArena.UP;
+        
     }
 
     @Override
     public void draw(Graphics g, int x, int y) {
-        // TODO Auto-generated method stub
+       
         
     }
 
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
+        
         return null;
     }
 
     @Override
     public String getTeamName() {
-        // TODO Auto-generated method stub
+        // 
         return null;
     }
 
     @Override
     public String outgoingMessage() {
-        // TODO Auto-generated method stub
+       
         return null;
     }
 
     @Override
     public void incomingMessage(int botNum, String msg) {
-        // TODO Auto-generated method stub
+        
         
     }
 
     @Override
     public String[] imageNames() {
-        // TODO Auto-generated method stub
+       
         return null;
     }
 
     @Override
     public void loadedImages(Image[] images) {
-        // TODO Auto-generated method stub
+        
         
     }
     
 }
+
+    
+
