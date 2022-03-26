@@ -6,6 +6,27 @@ public class Vector2
     // Members
     public double x;
     public double y;
+
+    public static Vector2 LEFT(){
+        return new Vector2(-3, 0);
+    }
+
+    public static Vector2 RIGHT(){
+        return new Vector2( 3, 0);
+    }
+
+    public static Vector2 UP(){
+        return new Vector2(-3, 0);
+    }
+
+    public static Vector2 DOWN(){
+        return new Vector2( 3, 0);
+    }
+
+    public static Vector2 STAY(){
+        return new Vector2(0, 0);
+    }
+    
        
     // Constructors
     public Vector2() {
@@ -16,6 +37,10 @@ public class Vector2
     public Vector2(double x, double y) {
         this.x = x;
         this.y = y;
+    }
+
+    public String toString(){
+        return String.format("(%s, %s)", x, y);
     }
        
     // Compare two vectors

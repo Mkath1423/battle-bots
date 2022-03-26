@@ -38,6 +38,32 @@
  *  Move allong path
  */
 
+ /**
+  Plans
+
+  Target Finding
+    if(target dies or dont have target)
+        Choose best target based on tracked methods
+    
+    OnUpdate()
+        FindPath to target
+        SetPath variable
+        
+    Foreach bullet
+        if bullet will collide move away
+
+    MoveTowards to next node in path
+
+
+
+  Strategy 
+
+
+
+
+
+  */
+
 package bots;
 
 import java.awt.Color;
@@ -64,7 +90,7 @@ public class StapletonBot extends Bot{
     private final double xMidline = (BattleBotArena.TOP_EDGE  + BattleBotArena.BOTTOM_EDGE)/2;
     private final double yMidline = (BattleBotArena.LEFT_EDGE + BattleBotArena.RIGHT_EDGE )/2;
 
-    private final int DANGE_DISTANCE = 150; 
+    private final int DANGER_DISTANCE = 150; 
     private final int WALL_DISTANCE = 50;
     private final int BULLET_DISTANCE = 30;
 
@@ -274,7 +300,7 @@ public class StapletonBot extends Bot{
             }
 
             // is on left?
-            if(bullet.getX() < me.getX()){
+            if(bullet.getX() < me.getX() + Bot.RADIUS){
                 return BattleBotArena.RIGHT;
             }
             // is on right?
@@ -293,7 +319,7 @@ public class StapletonBot extends Bot{
             }
 
             // Is on above?
-            if(bullet.getY() < me.getY()){
+            if(bullet.getY() < me.getY() + Bot.RADIUS){
                 return BattleBotArena.DOWN;
             }
             // Is on below?
@@ -372,106 +398,119 @@ public class StapletonBot extends Bot{
             }
         }
         
-        // FIND DANGEROUS BULLETS
-        List<Bullet> dangerous_bullets = new ArrayList<>();
-        for(Bullet bullet : bullets){
+        // FIND AND DODGE BULLETS
+        for(Bullet b : bullets){
             // is the bullet close
-            double dist_to_bullet = botHelper.calcDistance(me.getX(), me.getY(), bullet.getX(), bullet.getY());
-            if(dist_to_bullet > DANGE_DISTANCE || dist_to_bullet < 30) continue;
+            double dist_to_bullet = botHelper.calcDistance(me.getX(), me.getY(), b.getX(), b.getY());
+            if(dist_to_bullet > DANGER_DISTANCE) continue;
 
-            //System.out.printf("BULLET(%s, %s) ", bullet.getX(), bullet.getY());
+            if(b.getYSpeed() != 0){
+                // escape if bullet is not aligned in the x
+                if(!(me.getX() < b.getX() && b.getX() < me.getX() + 2*RADIUS)) continue;
 
-            // will the bullet collide if I stay still
-            if(!(bullet.getYSpeed() != 0 && bullet.getX() < me.getX() + BULLET_DISTANCE && bullet.getX() > me.getX() - BULLET_DISTANCE ||
-                 bullet.getXSpeed() != 0 && bullet.getY() < me.getY() + BULLET_DISTANCE && bullet.getY() > me.getY() - BULLET_DISTANCE   )) continue;
+                // escape if bullet is not moving towards me
+                if(!((b.getYSpeed() > 0 && b.getY() < me.getY() + Bot.RADIUS) ||
+                     (b.getYSpeed() < 0 && b.getY() > me.getY() + Bot.RADIUS))) continue;
 
-            if(bullet.getXSpeed() == 0 && bullet.getYSpeed() < 0 && bullet.getY() > me.getY() - BULLET_DISTANCE){
-                dangerous_bullets.add(bullet);
+                // if bullet is near wall (TODO: or cant move in dir)
+                if(b.getX() < BattleBotArena.LEFT_EDGE  + RADIUS*2) return BattleBotArena.RIGHT; 
+                if(b.getX() > BattleBotArena.RIGHT_EDGE - RADIUS*2) return BattleBotArena.LEFT; 
+                
+                // choose closest side
+                return (me.getX() + RADIUS < b.getX()) ? BattleBotArena.LEFT : BattleBotArena.RIGHT;
             }
-            else if(bullet.getXSpeed() == 0 && bullet.getYSpeed() > 0 && bullet.getY() < me.getY() + BULLET_DISTANCE){
-                dangerous_bullets.add(bullet);
-            }
-            else if(bullet.getYSpeed() == 0 && bullet.getXSpeed() < 0 && bullet.getX() > me.getX() - BULLET_DISTANCE){
-                dangerous_bullets.add(bullet);
-            }
-            else if(bullet.getYSpeed() == 0 && bullet.getXSpeed() > 0 && bullet.getX() < me.getX() + BULLET_DISTANCE){
-                dangerous_bullets.add(bullet);
+
+            if(b.getXSpeed() != 0){
+                // escape if bullet is not aligned in the x
+                if(!(me.getY() < b.getY() && b.getY() < me.getY() + 2*RADIUS)) continue;
+
+                // escape if bullet is not moving towards me
+                if(!((b.getXSpeed() > 0 && b.getX() < me.getX() + Bot.RADIUS) ||
+                     (b.getXSpeed() < 0 && b.getX() > me.getX() + Bot.RADIUS))) continue;
+
+                // if bullet is near wall (TODO: or cant move in dir)
+                if(b.getY() < BattleBotArena.TOP_EDGE  + RADIUS*2) return BattleBotArena.DOWN; 
+                if(b.getY() > BattleBotArena.BOTTOM_EDGE - RADIUS*2) return BattleBotArena.UP; 
+                
+                // choose closest side
+                return (me.getY() + RADIUS < b.getY()) ? BattleBotArena.UP : BattleBotArena.DOWN;
             }
         }
 
-        // IF THERE IS A BULLET TO DODGE, DODGE IT
-        if(dangerous_bullets.size() != 0){
-            return dodge(me, findClosestBullet(me, dangerous_bullets));
-        }
+        // // IF THERE IS A BULLET TO DODGE, DODGE IT
+        // if(dangerous_bullets.size() != 0){
+        //     return dodge(me, findClosestBullet(me, dangerous_bullets));
+        // }
 
-        // MOVEMENT PATTERENS
-        else{
+        // // MOVEMENT PATTERENS
+        // else{
 
-            // IF THERE ARE ALOT OF BOTS, SPRAY AND PRAY
-            // if(shotOK && targetingDelayCounter > 0 && liveBots.length >= BattleBotArena.NUM_BOTS * TARGETING_THRESHHOLD){
-            //     return 5 + (int)(Math.random() * ((8 - 5) + 1));
-            // }
+        //     // IF THERE ARE ALOT OF BOTS, SPRAY AND PRAY
+        //     // if(shotOK && targetingDelayCounter > 0 && liveBots.length >= BattleBotArena.NUM_BOTS * TARGETING_THRESHHOLD){
+        //     //     return 5 + (int)(Math.random() * ((8 - 5) + 1));
+        //     // }
 
             
-            if(meTracker.cycleNumber < 80){
-                return AvoidObstacle(BattleBotArena.UP, me, new Vector2(1000, 0), liveBots, deadBots);
-            }
+        //     if(meTracker.cycleNumber < 80){
+        //         return AvoidObstacle(BattleBotArena.UP, me, new Vector2(1000, 0), liveBots, deadBots);
+        //     }
 
-            String targetName = getBestTarget(me);
-            currentTarget = targetName;
-            BotInfo target = getInfoByName(liveBots, targetName);
+        //     String targetName = getBestTarget(me);
+        //     currentTarget = targetName;
+        //     BotInfo target = getInfoByName(liveBots, targetName);
 
-            double x_target = me.getX(), y_target = me.getY();
+        //     double x_target = me.getX(), y_target = me.getY();
 
-            double yDistToTarget = target.getY() - me.getY();
-            double xdistToTarget = target.getX() - me.getX();
+        //     double yDistToTarget = target.getY() - me.getY();
+        //     double xdistToTarget = target.getX() - me.getX();
 
-            if(Math.abs(xdistToTarget) > Math.abs(yDistToTarget)){
-                if(xdistToTarget > 0){
-                    y_target = target.getY();
-                    x_target = target.getX() - KILL_DISTANCE;
-                } 
-                else{
-                    y_target = target.getY();
-                    x_target = target.getX() + KILL_DISTANCE;
-                }
-            }
-            else{
-                if(yDistToTarget > 0){
-                    y_target = target.getY() - KILL_DISTANCE;
-                    x_target = target.getX();
-                } 
-                else{
-                    y_target = target.getY() + KILL_DISTANCE;
-                    x_target = target.getX();
-                }
-            }
+        //     if(Math.abs(xdistToTarget) > Math.abs(yDistToTarget)){
+        //         if(xdistToTarget > 0){
+        //             y_target = target.getY();
+        //             x_target = target.getX() - KILL_DISTANCE;
+        //         } 
+        //         else{
+        //             y_target = target.getY();
+        //             x_target = target.getX() + KILL_DISTANCE;
+        //         }
+        //     }
+        //     else{
+        //         if(yDistToTarget > 0){
+        //             y_target = target.getY() - KILL_DISTANCE;
+        //             x_target = target.getX();
+        //         } 
+        //         else{
+        //             y_target = target.getY() + KILL_DISTANCE;
+        //             x_target = target.getX();
+        //         }
+        //     }
 
-            double x_diff = me.getX() - x_target;
-            double y_diff = me.getY() - y_target;
+        //     double x_diff = me.getX() - x_target;
+        //     double y_diff = me.getY() - y_target;
 
-            int move_choice;
+        //     int move_choice;
 
-            // MOVE TO TARGET POSITION
-            if(Math.abs(x_diff) > Math.abs(y_diff)){
-                if(x_diff <= 0){
-                    move_choice = BattleBotArena.RIGHT;
-                }
-                else{
-                    move_choice = BattleBotArena.LEFT;
-                }
-            }
-            else{
-                if(y_diff <= 0){
-                    move_choice = BattleBotArena.DOWN;
-                }
-                else{
-                    move_choice = BattleBotArena.UP;
-                }
-            }
+        //     // MOVE TO TARGET POSITION
+        //     if(Math.abs(x_diff) > Math.abs(y_diff)){
+        //         if(x_diff <= 0){
+        //             move_choice = BattleBotArena.RIGHT;
+        //         }
+        //         else{
+        //             move_choice = BattleBotArena.LEFT;
+        //         }
+        //     }
+        //     else{
+        //         if(y_diff <= 0){
+        //             move_choice = BattleBotArena.DOWN;
+        //         }
+        //         else{
+        //             move_choice = BattleBotArena.UP;
+        //         }
+        //     }
 
-            return AvoidObstacle(move_choice, me, new Vector2(x_target, y_target), liveBots, deadBots);
-        }
+        //     return AvoidObstacle(move_choice, me, new Vector2(x_target, y_target), liveBots, deadBots);
+        // }
+        return BattleBotArena.STAY;
         
     }
 

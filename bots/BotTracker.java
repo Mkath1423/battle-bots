@@ -18,6 +18,9 @@ public class BotTracker {
     public double currentX = 0;
     public double currentY = 0;
 
+    public double lastX = 0;
+    public double lastY = 0;
+
     public int bulletsDodged = 0;
     
     public int timesShot = 0;
@@ -42,6 +45,19 @@ public class BotTracker {
                w_overheated * (isOverheated ? 1 : 0) + 
                w_dodged * -(bulletsDodged - 5);
     }
+
+    public double getXSpeed(){
+        return currentX - lastX;
+    }
+
+    public double getYSpeed(){
+        return currentY - lastY;
+    }
+
+    public Vector2 getSpeed(){
+        return new Vector2(getXSpeed(), getYSpeed());
+    }
+
 
     public BotTracker(){
         
@@ -96,6 +112,9 @@ public class BotTracker {
         isDead = info.isDead();
 
         lastMove = info.getLastMove();
+
+        lastX = currentX;
+        lastY = currentY;
 
         currentX = info.getX();
         currentY = info.getY();

@@ -24,7 +24,7 @@ public class FahadBot extends Bot {
 
     //array to store moves
     //array to store moves(move[1,2,3,4])
-    int [] move = new int[4]
+    int [] move = new int[4];
     move [0]=  BattleBotArena.UP;
     move [1]=  BattleBotArena.DOWN;
     move [2]= BattleBotArena.LEFT;
@@ -48,11 +48,11 @@ public class FahadBot extends Bot {
     public int getMove(BotInfo me, boolean shotOK, BotInfo[] liveBots, BotInfo[] deadBots, Bullet[] bullets) {
         // TODO Auto-generated method stub
         //adding a comment
-        //helper.findClosestBot(_me, _bots)
-        //double myX = FahadBot.getRadius();
-        for (int i = 0; i< bullets[2].length(); i++){
-            int currnetBulletX = bullets[2][i].getX();
-            if (currentBulletX = myX -  5)
+        // //helper.findClosestBot(_me, _bots)
+        // //double myX = FahadBot.getRadius();
+        // for (int i = 0; i< bullets[2].length(); i++){
+        //     int currnetBulletX = bullets[2][i].getX();
+        //     if (currentBulletX = myX -  5)
                 return BattleBotArena.UP;
     }
 

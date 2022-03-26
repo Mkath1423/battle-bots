@@ -300,7 +300,7 @@ public class BattleBotArena extends JPanel implements MouseListener, MouseWheelL
 	 * Total number of Bots in round 1 (if you have fewer than this, the rest of the spots
 	 * in the array will be filled with Drones, RandBots, and Sentries).
 	 */
-	public static final int 	NUM_BOTS = 30;//BROOKS NOV 12 2017 Changed to 16
+	public static final int 	NUM_BOTS = 2;//BROOKS NOV 12 2017 Changed to 16
 	/**
 	 * Number of bullets on screen at once for each bot
 	 */
@@ -462,7 +462,7 @@ public class BattleBotArena extends JPanel implements MouseListener, MouseWheelL
 	/**
 	 * The main state variable - controls what phase of the game we are at (see the State constants)
 	 */
-	private int state = WAIT_TO_START; // state variable
+	private int state = TEST_MODE; // state variable
 	/**
 	 * Used when going into test mode - false while bots are being set up, constructors called, etc.
 	 */
@@ -609,36 +609,36 @@ public class BattleBotArena extends JPanel implements MouseListener, MouseWheelL
 		// *** as the bots will be shuffled again later.
 		// *** Any empty spots will be filled with standard arena bots.
 
-		bots[1] = new DerrickBot();
-		bots[2] = new VainioBot();
-		bots[3] = new JabshehBot();
-		bots[4] = new ShaunBot();
-		// bots[5] = new ZZBot();
-		bots[6] = new SarmaBot();
-		bots[7] = new KernerBot();
-		bots[8] = new RasmussenBot();
-		// bots[9] = new ZZBot();
-		// bots[10] = new ZZBot();
-		bots[11] = new AlajramiBot();
-		// bots[12] = new ZZBot();
-		bots[13] = new WilliamBot();
-		bots[14] = new SharmaBot();
-		// bots[15] = new ZZBot();
-		// bots[16] = new ZZBot();
-		bots[17] = new StapletonBot();
-		bots[18] = new BakerBot();
-		bots[19] = new Megaman();
-		bots[20] = new FahadBot();
-		bots[21] = new KarthikBot();
-		bots[22] = new MofeBot();
-		bots[23] = new Jacky();
-		bots[24] = new KyleBot();
-		bots[25] = new KapurBot();
-		bots[26] = new JinBot();
-		bots[27] = new BennettBot();
-		bots[28] = new EdwardsBot();
-		bots[29] = new TangBot();
-		// bots[30] = new ZZBot();
+		// bots[1] = new DerrickBot();
+		// bots[2] = new VainioBot();
+		// bots[3] = new JabshehBot();
+		// bots[4] = new ShaunBot();
+		// // bots[5] = new ZZBot();
+		// bots[6] = new SarmaBot();
+		// bots[7] = new KernerBot();
+		// bots[8] = new RasmussenBot();
+		// // bots[9] = new ZZBot();
+		// // bots[10] = new ZZBot();
+		// bots[11] = new AlajramiBot();
+		// // bots[12] = new ZZBot();
+		// bots[13] = new WilliamBot();
+		// bots[14] = new SharmaBot();
+		// // bots[15] = new ZZBot();
+		// // bots[16] = new ZZBot();
+		 bots[1] = new TwoDotBot();
+		// bots[18] = new BakerBot();
+		// bots[19] = new Megaman();
+		// bots[20] = new FahadBot();
+		// bots[21] = new KarthikBot();
+		// bots[22] = new MofeBot();
+		// bots[23] = new Jacky();
+		// bots[24] = new KyleBot();
+		// bots[25] = new KapurBot();
+		// bots[26] = new JinBot();
+		// bots[3] = new BennettBot();
+		// bots[28] = new EdwardsBot();
+		// bots[29] = new TangBot();
+		// //bots[30] = new ZZBot();
 
 		
 		// *******************************
@@ -1279,7 +1279,7 @@ public class BattleBotArena extends JPanel implements MouseListener, MouseWheelL
 							}
 							else // 6b. otherwise, check for bot collisions
 							{
-								if (state != TEST_MODE) // not if in test mode
+								//if (state != TEST_MODE) // not if in test mode TODO: CHANGE THIS BACK
 								{
 									for (int j = 0; j<NUM_BOTS; j++)
 									{
@@ -1291,14 +1291,14 @@ public class BattleBotArena extends JPanel implements MouseListener, MouseWheelL
 												bullets[i][k] = null; // no more bullet
 												if (botsInfo[j].isDead() == false) // kill bot if possible
 												{
-													if (soundOn)
-														death.play();
-													botsInfo[i].addKill();
-													botsInfo[j].killed(botsInfo[i].getName());
-													botsInfo[j].setTimeOfDeath(timePlayed);
-													botsInfo[j].setScore(currentScore(j,false)); // final score of dead bot
-													//botsInfo[i].setScore(currentScore(i,false));
-													botsLeft--;
+													// if (soundOn)
+													// 	death.play();
+													// botsInfo[i].addKill();
+													// botsInfo[j].killed(botsInfo[i].getName());
+													// botsInfo[j].setTimeOfDeath(timePlayed);
+													// botsInfo[j].setScore(currentScore(j,false)); // final score of dead bot
+													// //botsInfo[i].setScore(currentScore(i,false));
+													// botsLeft--;
 													sendMessage(SYSTEM_MSG, botsInfo[j].getName()+" destroyed by "+botsInfo[i].getName()+".");
 												}
 												break; // only one collision per bullet
