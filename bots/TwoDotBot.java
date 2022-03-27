@@ -79,6 +79,8 @@ import java.util.function.Consumer;
 
 import javax.swing.plaf.basic.BasicBorders.RadioButtonBorder;
 
+import org.w3c.dom.UserDataHandler;
+
 import arena.BattleBotArena;
 import arena.BotInfo;
 import arena.Bullet;
@@ -131,6 +133,8 @@ public class TwoDotBot extends Bot {
 
     private String currentTarget = "";
 
+    private Dot[] dots = new Dot[2];
+
     @Override
     public void newRound() {
         shootDelayCounter = SHOOT_DELAY_START;
@@ -141,6 +145,19 @@ public class TwoDotBot extends Bot {
         for (Entry<String, BotTracker> info : trackedInfo.entrySet()) {
             info.getValue().reset();
         }
+
+        dots[0] = new Dot(
+                new Vector2(7, 18),
+                Vector2.UnitVector(randrange(0,  359)),
+                3
+            );
+
+        dots[1] = new Dot(
+                new Vector2(10, 10),
+                Vector2.UnitVector(randrange(0,  359)),
+                4
+            );
+
     }
 
     // PATH FINDING
@@ -617,24 +634,62 @@ public class TwoDotBot extends Bot {
         return Min + (int) (Math.random() * ((Max - Min) + 1));
     }
 
-    private int dot_x = 5;
-    private int dot_y = 5;
+    private double randrange(double Min, double Max) {
+        return Min + (Math.random() * ((Max - Min) + 1));
+    }
+
+    private double last_time = System.currentTimeMillis();
 
     @Override
     public void draw(Graphics g, int x, int y) {
-        // if(meTracker.cycleNumber % 5 == 0){
-        // dot_x = randint(0, 26);
-        // dot_y = randint(0, 26);
-        // }
 
-        g.setColor(new Color(randint(0, 255), randint(0, 255), randint(0, 255)));
-        g.fillOval(x + dot_x, y + dot_y, 6, 6);
+        double current_time = System.currentTimeMillis();
+
+        double dt = (current_time - last_time)/40;
+        
+        for (Dot dot : dots) {
+            dot.move(dt);
+            dot.checkWallCollision(13, dt);
+        }
+
+        last_time = current_time;
+
+        if(dots[0].radius + dots[1].radius > Math.sqrt(Math.pow((dots[0].pos.x - dots[1].pos.x), 2) + Math.pow((dots[0].pos.y - dots[1].pos.y), 2))){
+            //System.out.println("colliding " + Math.sqrt(Math.pow((dots[0].pos.x - dots[1].pos.x), 2) + Math.pow((dots[0].pos.y - dots[1].pos.y), 2)));
+            Vector2 d0_vel = dots[0].vel.copy();
+            Vector2 d1_vel = dots[1].vel.copy();
+            
+            // System.out.println("0b"+ dots[0].vel.toString());
+            // System.out.println("1b"+ dots[1].vel.toString());
+
+            dots[0].collide(new Dot(dots[1].pos.copy(), d1_vel, dots[1].radius));
+            dots[1].collide(new Dot(dots[0].pos.copy(), d0_vel, dots[0].radius));
+
+            // System.out.println("0a"+ dots[0].vel.toString());
+            // System.out.println("1a"+ dots[1].vel.toString());
+
+            dots[0].pos = Vector2.sub(dots[0].pos, Vector2.scale(d0_vel, 2*dt));
+            dots[1].pos = Vector2.sub(dots[1].pos, Vector2.scale(d1_vel, 2*dt));
+        }
+
+        for (Dot dot : dots) {
+            dot.draw(g, x, y);
+        }
+
+        g.setColor(new Color(255, 255, 255));
+        g.drawOval(x-1, y-1, 26, 26);
+
+        g.fillRect(
+            (int)trackedInfo.get("Human").currentX, 
+            (int)trackedInfo.get("Human").currentY, 
+            26, 
+            26);
 
     }
 
     @Override
     public String getName() {
-        return "a-dot";
+        return "two-dot";
     }
 
     @Override
