@@ -7,6 +7,7 @@ public class BotTracker {
     BotHelper helper = new BotHelper();
 
     public String botName = "";
+    public String botTeamName = "";
 
     public int cycleNumber = 1;
 
@@ -69,6 +70,7 @@ public class BotTracker {
 
         lastMove = info.getLastMove();
         botName = info.getName();
+        botTeamName = info.getTeamName();
     }
 
     public void reset(){

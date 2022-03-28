@@ -163,17 +163,17 @@ public class TwoDotBot extends Bot {
     // PATH FINDING
 
     // OBSTACLE AVOIDANCE
-    private boolean checkForObstacles(Vector2 center, BotInfo[] liveBotInfos, BotInfo[] deadBotInfos) {
+    private boolean checkForObstacles(Vector2 tl, BotInfo[] liveBotInfos, BotInfo[] deadBotInfos) {
         for (BotInfo deadBot : deadBotInfos) {
-            if (Math.abs(deadBot.getX() - center.x) <= 13 * 2 &&
-                    Math.abs(deadBot.getY() - center.y) <= 13 * 2) {
+            if (tl.x <= deadBot.getX() && deadBot.getX() <= tl.x + RADIUS*2 &&
+                tl.y <= deadBot.getY() && deadBot.getY() <= tl.y + RADIUS*2) {
                 return true;
             }
         }
 
         for (BotInfo liveBot : liveBotInfos) {
-            if (Math.abs(liveBot.getX() - center.x) <= 13 * 2 &&
-                    Math.abs(liveBot.getY() - center.y) <= 13 * 2) {
+            if (tl.y <= liveBot.getY() && liveBot.getY() <= tl.y + RADIUS*2 &&
+                tl.y <= liveBot.getY() && liveBot.getY() <= tl.y + RADIUS*2) {
                 return true;
             }
         }
@@ -264,6 +264,7 @@ public class TwoDotBot extends Bot {
         double bestScore = 0;
 
         for (Entry<String, BotTracker> bot : trackedInfo.entrySet()) {
+            if(bot.getValue().botTeamName == getTeamName()) continue; // dont choose your team as a target
             double score = bot.getValue().SortMetric(me, w_proxy, w_shooting, w_stationary, w_overheated, w_dodged);
 
             if (score > bestScore) {
@@ -284,6 +285,22 @@ public class TwoDotBot extends Bot {
         return bots[0];
     }
 
+    public boolean willBulletHit(BotInfo bot, BotTracker tracker, Bullet bullet){
+
+        if (tracker.getSpeed().equals(Vector2.STAY())) {
+            if (bullet.getYSpeed() < 0 && // if bullet is moving in negative y
+                bot.getY() < bullet.getY() && // if bot is above bullet
+                bullet.getX() < bot.getX() && bot.getX() < bullet.getX()){ // if x positions are aligned 
+
+            }
+
+        }
+
+
+        return false;
+    }
+
+    // Shooting
     public int shoot(BotInfo me, BotInfo[] targets) {
         sortBots(me, targets);
 
@@ -601,8 +618,8 @@ public class TwoDotBot extends Bot {
 
 
             int move_choice = moveToTargetPosition(me, targetPos);
-
-            return AvoidObstacle(move_choice, me, new Vector2(targetPos.x, targetPos.y), liveBots, deadBots);
+            return move_choice;
+            // return AvoidObstacle(move_choice, me, new Vector2(targetPos.x, targetPos.y), liveBots, deadBots);
             
         } catch (Exception e) {
             // e.printStackTrace();
@@ -676,7 +693,7 @@ public class TwoDotBot extends Bot {
     @Override
     public String getTeamName() {
         // TODO Auto-generated method stub
-        return null;
+        return "QuadDots";
     }
 
     @Override
