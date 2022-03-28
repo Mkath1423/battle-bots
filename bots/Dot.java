@@ -41,7 +41,7 @@ public class Dot {
 
     public void checkWallCollision(double wall_radius, double dt){
         if(wall_radius - radius < Math.sqrt(Math.pow(pos.x - wall_radius, 2) + Math.pow(pos.y - wall_radius, 2))){
-            System.out.println(Math.sqrt(Math.pow(pos.x - wall_radius, 2) + Math.pow(pos.y - wall_radius, 2)));
+            //System.out.println(Math.sqrt(Math.pow(pos.x - wall_radius, 2) + Math.pow(pos.y - wall_radius, 2)));
             
             Vector2 n = new Vector2(pos.x - wall_radius, pos.y - wall_radius);
 

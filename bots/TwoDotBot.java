@@ -379,7 +379,7 @@ public class TwoDotBot extends Bot {
 
             if (b.getYSpeed() != 0) {
                 // escape if bullet is not aligned in the x
-                if (!(me.getX() < b.getX() && b.getX() < me.getX() + 2 * RADIUS))
+                if (!(me.getX() -10< b.getX() && b.getX() < me.getX()+10 + 2 * RADIUS))
                     continue;
 
                 // escape if bullet is not moving towards me
@@ -399,7 +399,7 @@ public class TwoDotBot extends Bot {
 
             if (b.getXSpeed() != 0) {
                 // escape if bullet is not aligned in the x
-                if (!(me.getY() < b.getY() && b.getY() < me.getY() + 2 * RADIUS))
+                if (!(me.getY()-10 < b.getY() && b.getY() < me.getY()+10 + 2 * RADIUS))
                     continue;
 
                 // escape if bullet is not moving towards me
@@ -521,66 +521,120 @@ public class TwoDotBot extends Bot {
         // deadBots);
         // }
 
-        // String targetName = getBestTarget(me);
-        // currentTarget = targetName;
-        // BotInfo target = getInfoByName(liveBots, targetName);
+        String targetName = getBestTarget(me);
+        currentTarget = targetName;
+        BotInfo target = getInfoByName(liveBots, targetName);
 
-        // double x_target = me.getX(), y_target = me.getY();
+        double x_target = me.getX(), y_target = me.getY();
 
-        // double yDistToTarget = target.getY() - me.getY();
-        // double xdistToTarget = target.getX() - me.getX();
+        double yDistToTarget = target.getY() - me.getY();
+        double xdistToTarget = target.getX() - me.getX();
 
-        // if(Math.abs(xdistToTarget) > Math.abs(yDistToTarget)){
-        // if(xdistToTarget > 0){
-        // y_target = target.getY();
-        // x_target = target.getX() - KILL_DISTANCE;
-        // }
-        // else{
-        // y_target = target.getY();
-        // x_target = target.getX() + KILL_DISTANCE;
-        // }
-        // }
-        // else{
-        // if(yDistToTarget > 0){
-        // y_target = target.getY() - KILL_DISTANCE;
-        // x_target = target.getX();
-        // }
-        // else{
-        // y_target = target.getY() + KILL_DISTANCE;
-        // x_target = target.getX();
-        // }
-        // }
+        if(Math.abs(xdistToTarget) > Math.abs(yDistToTarget)){
+        if(xdistToTarget > 0){
+        y_target = target.getY();
+        x_target = target.getX() - KILL_DISTANCE;
+        }
+        else{
+        y_target = target.getY();
+        x_target = target.getX() + KILL_DISTANCE;
+        }
+        }
+        else{
+        if(yDistToTarget > 0){
+        y_target = target.getY() - KILL_DISTANCE;
+        x_target = target.getX();
+        }
+        else{
+        y_target = target.getY() + KILL_DISTANCE;
+        x_target = target.getX();
+        }
+        }
 
-        // double x_diff = me.getX() - x_target;
-        // double y_diff = me.getY() - y_target;
+        x_target = 100;
+        y_target = 100;
 
-        // int move_choice;
+        double x_diff = me.getX() - x_target;
+        double y_diff = me.getY() - y_target;
 
-        // // MOVE TO TARGET POSITION
-        // if(Math.abs(x_diff) > Math.abs(y_diff)){
-        // if(x_diff <= 0){
-        // move_choice = BattleBotArena.RIGHT;
-        // }
-        // else{
-        // move_choice = BattleBotArena.LEFT;
-        // }
-        // }
-        // else{
-        // if(y_diff <= 0){
-        // move_choice = BattleBotArena.DOWN;
-        // }
-        // else{
-        // move_choice = BattleBotArena.UP;
-        // }
-        // }
+        int move_choice;
+
+        // MOVE TO TARGET POSITION
+        if(Math.abs(x_diff) > Math.abs(y_diff)){
+            if(x_diff <= 0){
+            move_choice = BattleBotArena.RIGHT;
+            }
+            else{
+                move_choice = BattleBotArena.LEFT;
+            }
+        }
+        else{
+            if(y_diff <= 0){
+                move_choice = BattleBotArena.DOWN;
+            }
+            else{
+                move_choice = BattleBotArena.UP;
+            }
+        }
 
         // return AvoidObstacle(move_choice, me, new Vector2(x_target, y_target),
         // liveBots, deadBots);
         // }
-        return BattleBotArena.STAY;
+        return move_choice;
 
     }
 
+    private int moveToTargetPosition(BotInfo me, Vector2 target_pos){
+
+        double x_diff = me.getX() - target_pos.x;
+        double y_diff = me.getY() - target_pos.y;
+
+        // MOVE TO TARGET POSITION
+        if(Math.abs(x_diff) > Math.abs(y_diff)){
+            if(x_diff <= 0) return BattleBotArena.RIGHT;
+            else            return BattleBotArena.LEFT;
+        }
+        else{
+            if(y_diff <= 0) return BattleBotArena.DOWN;
+            else            return BattleBotArena.UP;
+        }
+    }
+
+
+    private Vector2 getShootingPosition(BotInfo me, BotInfo target, BotInfo[] deadBots){
+
+        Vector2 shootingPosition = new Vector2();
+
+        Vector2 distToTarget = new Vector2(
+            target.getX() - me.getX(),
+            target.getY() - me.getY()
+        );
+
+        if(Math.abs(distToTarget.x) > Math.abs(distToTarget.y)){
+            if(distToTarget.x > 0){
+                shootingPosition.y = target.getY();
+                shootingPosition.x = target.getX() - KILL_DISTANCE;
+            }
+            else{
+                shootingPosition.y = target.getY();
+                shootingPosition.x = target.getX() + KILL_DISTANCE;
+            }
+        }
+        else{
+            if(distToTarget.y > 0){
+                shootingPosition.y = target.getY() - KILL_DISTANCE;
+                shootingPosition.x = target.getX();
+            }
+            else{
+                shootingPosition.y = target.getY() + KILL_DISTANCE;
+                shootingPosition.x = target.getX();
+            }
+        }
+
+        return shootingPosition;
+    }
+
+    // ANCHOR: GET MOVE
     @Override
     public int getMove(BotInfo me, boolean shotOK, BotInfo[] liveBots, BotInfo[] deadBots, Bullet[] bullets) {
         try {
@@ -618,11 +672,26 @@ public class TwoDotBot extends Bot {
             }
 
             // find best target
+            
+            String targetName = getBestTarget(me);
+            currentTarget = targetName;
+            BotInfo target = getInfoByName(liveBots, targetName);
+
+            Vector2 targetPos = getShootingPosition(me, target, deadBots);
+            System.out.println(
+                "t(" + target.getX() + ", " + target.getY() + ")" +
+                "->" + targetPos.toString()
+            );
+
+
             // find best target pos
             // find path to target
 
-            return BattleBotArena.STAY;
-            // return getMoveSafe(me, shotOK, liveBots, deadBots, bullets);
+
+            int move_choice = moveToTargetPosition(me, targetPos);
+
+            return AvoidObstacle(move_choice, me, new Vector2(targetPos.x, targetPos.y), liveBots, deadBots);
+            
         } catch (Exception e) {
             // e.printStackTrace();
             return BattleBotArena.STAY;
