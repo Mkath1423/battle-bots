@@ -421,17 +421,8 @@ public class TwoDotBot extends Bot {
         return -1;
     }
 
-    // SHOOT WHEN INFRONT OF A BOT
-    private boolean isShootable(BotInfo me, double x, double y) {
-        return (Math.abs(me.getY() - y) <= ACCURACY) || (Math.abs(me.getX() - x) <= ACCURACY);
-    }
-
-    private boolean isShootable(BotInfo me, BotTracker other, double x, double y) {
-        return (Math.abs(me.getY() - y) <= ACCURACY) || (Math.abs(me.getX() - x) <= ACCURACY);
-    }
-
     private int shoot(BotInfo me, double x, double y) {
-        shootDelayCounter = SHOOT_DELAY_START;
+        shootDelayCounter = 5;
         if (Math.abs(me.getY() - y) <= ACCURACY) {
             if (x > me.getX()) {
                 return BattleBotArena.FIRERIGHT;
@@ -484,29 +475,6 @@ public class TwoDotBot extends Bot {
 
     }
 
-    private int getMoveSafe(BotInfo me, boolean shotOK, BotInfo[] liveBots, BotInfo[] deadBots, Bullet[] bullets) {
-        sortBots(me, liveBots);
-        for (BotInfo info : liveBots) {
-            // Track their info
-            if (!trackedInfo.containsKey(info.getName())) {
-                trackedInfo.put(info.getName(), new BotTracker());
-            }
-            try {
-                trackedInfo.get(info.getName()).updateTracker(info);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            // if we can shoot
-            BotTracker tango = trackedInfo.get(info.getName());
-            if (shotOK && shootDelayCounter <= 0 && isShootable(me, tango, info.getX(), info.getY())) {
-                if (info.getName() == currentTarget) {
-                    tango.bulletsDodged += 1;
-                }
-                return shoot(me, info.getX(), info.getY());
-            }
-        }
-
         // // MOVEMENT PATTERENS
         // else{
 
@@ -521,68 +489,7 @@ public class TwoDotBot extends Bot {
         // deadBots);
         // }
 
-        String targetName = getBestTarget(me);
-        currentTarget = targetName;
-        BotInfo target = getInfoByName(liveBots, targetName);
-
-        double x_target = me.getX(), y_target = me.getY();
-
-        double yDistToTarget = target.getY() - me.getY();
-        double xdistToTarget = target.getX() - me.getX();
-
-        if(Math.abs(xdistToTarget) > Math.abs(yDistToTarget)){
-        if(xdistToTarget > 0){
-        y_target = target.getY();
-        x_target = target.getX() - KILL_DISTANCE;
-        }
-        else{
-        y_target = target.getY();
-        x_target = target.getX() + KILL_DISTANCE;
-        }
-        }
-        else{
-        if(yDistToTarget > 0){
-        y_target = target.getY() - KILL_DISTANCE;
-        x_target = target.getX();
-        }
-        else{
-        y_target = target.getY() + KILL_DISTANCE;
-        x_target = target.getX();
-        }
-        }
-
-        x_target = 100;
-        y_target = 100;
-
-        double x_diff = me.getX() - x_target;
-        double y_diff = me.getY() - y_target;
-
-        int move_choice;
-
-        // MOVE TO TARGET POSITION
-        if(Math.abs(x_diff) > Math.abs(y_diff)){
-            if(x_diff <= 0){
-            move_choice = BattleBotArena.RIGHT;
-            }
-            else{
-                move_choice = BattleBotArena.LEFT;
-            }
-        }
-        else{
-            if(y_diff <= 0){
-                move_choice = BattleBotArena.DOWN;
-            }
-            else{
-                move_choice = BattleBotArena.UP;
-            }
-        }
-
-        // return AvoidObstacle(move_choice, me, new Vector2(x_target, y_target),
-        // liveBots, deadBots);
-        // }
-        return move_choice;
-
-    }
+    
 
     private int moveToTargetPosition(BotInfo me, Vector2 target_pos){
 
@@ -669,6 +576,11 @@ public class TwoDotBot extends Bot {
                     shootDelayCounter = SHOOT_DELAY_START;
                     return shoot_dir;
                 }
+            }
+
+            if(liveBots.length > 0.8* BattleBotArena.NUM_BOTS){
+                BotInfo closest = botHelper.findClosestBot(me, liveBots);
+                return shoot(me, liveBots);
             }
 
             // find best target
